@@ -20,27 +20,22 @@ function cleanStaleSessionLocks(dataPath: string) {
     const sessionPath = path.resolve(dataPath, "session");
     if (!fs.existsSync(sessionPath)) return;
 
-    const lockFiles = [
-      "DevToolsActivePort",
-      "SingletonLock",
-      "SingletonCookie",
-      "SingletonSocket",
-    ];
-
     const targetDirs = [sessionPath, path.join(sessionPath, "Default")];
 
     for (const dir of targetDirs) {
       if (!fs.existsSync(dir)) continue;
-      for (const file of lockFiles) {
-        const filePath = path.join(dir, file);
-        try {
-          fs.lstatSync(filePath);
-          fs.unlinkSync(filePath);
-          console.log(`[WhatsApp] Cleaned stale lock: ${path.relative(dataPath, filePath)}`);
-        } catch (e) {
-          // File does not exist, ignore
+      try {
+        const entries = fs.readdirSync(dir);
+        for (const entry of entries) {
+          if (entry.startsWith("Singleton") || entry === "DevToolsActivePort") {
+            const filePath = path.join(dir, entry);
+            try {
+              fs.unlinkSync(filePath);
+              console.log(`[WhatsApp] Cleaned stale lock: ${path.relative(dataPath, filePath)}`);
+            } catch {}
+          }
         }
-      }
+      } catch {}
     }
   } catch (e) {
     // Ignore cleanup errors
