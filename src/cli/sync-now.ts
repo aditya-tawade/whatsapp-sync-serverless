@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 dotenv.config();
 
+import qrcodeTerminal from "qrcode-terminal";
 import { initPersistentWhatsApp } from "../whatsapp";
 import { getSavedOAuth2Client } from "../authStore";
 import { runHeadlessSync } from "../headlessSync";
@@ -22,7 +23,7 @@ async function main() {
   const gAuth = getSavedOAuth2Client();
   if (!gAuth) {
     console.error(
-      "\n[Error] No saved Google OAuth credentials found. Please run 'npm run setup' first to authenticate."
+      "\n[Error] No saved Google OAuth credentials found. Please ensure .credentials/google_tokens.json exists."
     );
     process.exit(1);
   }
@@ -31,10 +32,8 @@ async function main() {
 
   const whatsappClient = initPersistentWhatsApp({
     onQR: (qr) => {
-      console.warn(
-        "\n[Warning] WhatsApp session expired or not authenticated. Please run 'npm run setup' to scan QR code."
-      );
-      process.exit(1);
+      console.log("\n[WhatsApp] Please scan the QR code below using WhatsApp (Linked Devices):\n");
+      qrcodeTerminal.generate(qr, { small: true });
     },
     onReady: async () => {
       console.log("[Sync] WhatsApp client is ready.");
