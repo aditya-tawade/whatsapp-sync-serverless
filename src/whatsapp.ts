@@ -10,7 +10,7 @@ import {
 
 import { sendEvent } from "./ws";
 import { Base64 } from "./types";
-import { EventType } from "../../interfaces/api";
+import { EventType } from "./interfaces";
 import { deleteFromCache, getFromCache } from "./cache";
 import { verifyPurchaseWAId } from "./payments";
 import { toE164Digits } from "./phone";

@@ -7,7 +7,7 @@ import patch from "express-ws/lib/add-ws-method";
 
 import { WAState } from "whatsapp-web.js";
 
-import { SessionStatus, SyncOptions } from "../../interfaces/api";
+import { SessionStatus, SyncOptions } from "../src/interfaces";
 import { initWhatsApp } from "../src/whatsapp";
 import { initSync } from "../src/sync";
 import { generateGoogleAuthUrl, getOAuth2ClientFromCode } from "../src/gapi";

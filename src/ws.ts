@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 
-import { Event, EventType } from "../../interfaces/api";
+import { Event, EventType } from "./interfaces";
 
 export function sendEvent(
   ws: WebSocket,

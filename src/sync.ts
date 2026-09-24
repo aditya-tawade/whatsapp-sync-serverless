@@ -3,7 +3,7 @@ import { Auth } from "googleapis";
 import { RateLimiter } from "limiter";
 import { Client } from "whatsapp-web.js";
 
-import { EventType, SyncOptions } from "../../interfaces/api";
+import { EventType, SyncOptions } from "./interfaces";
 import { listContacts, updateContactPhoto } from "./gapi";
 import { downloadFile, loadContacts } from "./whatsapp";
 import { sendEvent, sendMessageAndWait } from "./ws";
