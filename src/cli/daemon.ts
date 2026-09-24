@@ -24,7 +24,10 @@ async function main() {
   const gAuth = getSavedOAuth2Client();
   if (!gAuth) {
     console.error(
-      "\n[Error] No saved Google OAuth credentials found. Please ensure .credentials/google_tokens.json exists."
+      "\n[Error] No saved Google OAuth credentials found.\n" +
+      "Please either:\n" +
+      "  - Copy .credentials/google_tokens.json to your server, OR\n" +
+      "  - Add GOOGLE_TOKENS_JSON to your .env file."
     );
     process.exit(1);
   }

@@ -25,16 +25,30 @@ export function saveGoogleTokens(tokens: Auth.Credentials): void {
 }
 
 export function getSavedGoogleTokens(): Auth.Credentials | null {
-  if (!fs.existsSync(TOKENS_FILE)) {
-    return null;
+  if (fs.existsSync(TOKENS_FILE)) {
+    try {
+      const data = fs.readFileSync(TOKENS_FILE, "utf-8");
+      return JSON.parse(data);
+    } catch (e) {
+      console.error(`[Google Auth] Failed to read tokens file:`, e);
+    }
   }
-  try {
-    const data = fs.readFileSync(TOKENS_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (e) {
-    console.error(`[Google Auth] Failed to read tokens file:`, e);
-    return null;
+
+  if (process.env.GOOGLE_TOKENS_JSON) {
+    try {
+      return JSON.parse(process.env.GOOGLE_TOKENS_JSON);
+    } catch (e) {
+      console.error(`[Google Auth] Failed to parse GOOGLE_TOKENS_JSON env var:`, e);
+    }
   }
+
+  if (process.env.GOOGLE_REFRESH_TOKEN) {
+    return {
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+    };
+  }
+
+  return null;
 }
 
 export function hasSavedGoogleTokens(): boolean {
