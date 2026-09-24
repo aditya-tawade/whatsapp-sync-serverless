@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+build
+.env
+.credentials
+.wwebjs_auth
+.git
+.github

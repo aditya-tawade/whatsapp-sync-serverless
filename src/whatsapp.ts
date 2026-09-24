@@ -48,9 +48,15 @@ const clientOptions = {
   puppeteer: {
     executablePath:
       process.env.RUNNING_IN_DOCKER === "true"
-        ? "/usr/bin/chromium-browser"
+        ? (process.env.PUPPETEER_EXECUTABLE_PATH ||
+           (fs.existsSync("/usr/bin/chromium") ? "/usr/bin/chromium" : "/usr/bin/chromium-browser"))
         : undefined,
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+    ],
     protocolTimeout: 300000,
   },
   webVersionCache: {

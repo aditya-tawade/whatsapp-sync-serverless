@@ -1,0 +1,11 @@
+services:
+  whatsapp-sync:
+    build: .
+    container_name: whatsapp-sync
+    restart: unless-stopped
+    shm_size: "256mb"
+    env_file:
+      - .env
+    volumes:
+      - ./.wwebjs_auth:/app/.wwebjs_auth
+      - ./.credentials:/app/.credentials

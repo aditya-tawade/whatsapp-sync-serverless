@@ -1,46 +1,24 @@
-### Build server files
-FROM node:26-alpine AS server-build
+FROM node:20-slim
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
-ENV PUPPETEER_SKIP_DOWNLOAD="true"
-WORKDIR /app/server
-
-COPY ["server/package.json", "server/package-lock.json*", "./"]
-
-RUN npm ci
-
-COPY ./interfaces /app/interfaces
-COPY ./server .
-
-RUN npm run build
-
-# Prepare node_modules for docker
-RUN npm prune --production
-RUN apk update && \
-    apk add curl && \
-    curl -sf https://gobinaries.com/tj/node-prune | sh
-
-# The mv is a workaround for this - https://github.com/tj/node-prune/issues/63
-RUN mv node_modules/googleapis/build/src/apis/docs ./docs && \
-    node-prune --exclude "**/googleapis/**/docs/*.js" && \
-    mv ./docs node_modules/googleapis/build/src/apis/docs
-
-
-### Build final image
-FROM node:26-alpine
-USER root
+# Install Chromium and runtime dependencies for Puppeteer
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    fonts-liberation \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV RUNNING_IN_DOCKER="true"
-WORKDIR /app/server
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium"
 
-# Install Chromium
-RUN apk update && \
-    apk add --no-cache nss udev ttf-freefont chromium nginx && \
-    rm -rf /var/cache/apk/* /tmp/*
+WORKDIR /app
 
-COPY --from=server-build /app/server/node_modules ./node_modules
-COPY --from=server-build /app/server/build ./build
+# Install dependencies
+COPY package*.json ./
+RUN npm install
 
-EXPOSE 8080
+# Copy application source code
+COPY . .
 
-CMD [ "build/server/main.js" ]
+# Default command: runs the weekly cron daemon
+CMD ["npm", "run", "daemon"]
